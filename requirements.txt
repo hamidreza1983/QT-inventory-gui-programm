@@ -7,4 +7,5 @@ pyinstaller-hooks-contrib==2023.3
 PyQt5==5.15.9
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.12.1
+python-dotenv==1.0.0
 pywin32-ctypes==0.2.0
