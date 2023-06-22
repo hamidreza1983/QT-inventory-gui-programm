@@ -57,7 +57,7 @@ class Window(QWidget):
                     message.ConnectionFailed()
                     
             else:
-                message.Error()
+                message.UserInputErrorError()
 
        
 

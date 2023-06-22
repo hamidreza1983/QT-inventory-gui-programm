@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon, QFont
 import os
 import sys
+from mysql.connector import connect
+from message import Message
+
 
 
 class PanelAdmin(QWidget):
@@ -38,20 +41,25 @@ class PanelAdmin(QWidget):
         self.lineedit2 = QLineEdit(self.group1)
         self.lineedit2.move(60, 58)
         self.lineedit2.resize(250,23)
+        self.lineedit2.setEchoMode(QLineEdit.Password)
         self.lineedit3 = QLineEdit(self.group1)
         self.lineedit3.move(60, 88)
         self.lineedit3.resize(250,23)
         #------------> Group1 QCheckBox
         self.checkBox1 = QCheckBox("admin", self.group1)
         self.checkBox1.move(318,35)
+        self.checkBox1.stateChanged.connect(self.changeState)
         self.checkBox2 = QCheckBox("inventor", self.group1)
         self.checkBox2.move(318,60)
+        self.checkBox2.stateChanged.connect(self.changeState)
         self.checkBox3 = QCheckBox("seller", self.group1)
         self.checkBox3.move(318,85)
+        self.checkBox3.stateChanged.connect(self.changeState)
         #------------> Group1 QPushButton
         self.button1 = QPushButton("Create user", self.group1)
         self.button1.move(85,120)
         self.button1.resize(200,30)
+        self.button1.clicked.connect(self.createuser)
         #------------> GroupBox2
         self.group2 = QGroupBox("Delete user", self)
         self.group2.move(10, 180)
@@ -64,32 +72,121 @@ class PanelAdmin(QWidget):
         self.lineedit4.move(84, 25)
         self.lineedit4.resize(200,25)
         #------------> Group2 QPushButton
-        self.button2 = QPushButton("Create user", self.group2)
+        self.button2 = QPushButton("Delete user", self.group2)
         self.button2.move(288,25)
         self.button2.resize(88,25)
         #------------> self
-        self.button3 = QPushButton("Create user", self)
+        self.button3 = QPushButton("Daily profit and loos", self)
         self.button3.move(13,250)
         self.button3.resize(175,40)
-        self.button4 = QPushButton("Create user", self)
+        self.button4 = QPushButton("Weekly profit and loos", self)
         self.button4.move(210,250)
         self.button4.resize(175,40)
-        self.button5 = QPushButton("Create user", self)
+        self.button5 = QPushButton("Mountly profit and loos", self)
         self.button5.move(13,300)
         self.button5.resize(175,40)
-        self.button6 = QPushButton("Create user", self)
+        self.button6 = QPushButton("Yearly profit and loos", self)
         self.button6.move(210,300)
         self.button6.resize(175,40)
-        self.button7 = QPushButton("Create user", self)
+        self.button7 = QPushButton("Total profit and loos", self)
         self.button7.move(13,350)
         self.button7.resize(375,25)
-        self.button8 = QPushButton("Create user", self)
+        self.button8 = QPushButton("Exit", self)
         self.button8.move(13,380)
         self.button8.resize(375,25)
+        self.show()
+
+
+    def changeState(self):
+        if self.checkBox1.isChecked():
+            self.checkBox2.setEnabled(False)
+            self.checkBox3.setEnabled(False)
+
+        elif self.checkBox2.isChecked():
+            self.checkBox1.setEnabled(False)
+            self.checkBox3.setEnabled(False)
+
+        elif self.checkBox3.isChecked():
+            self.checkBox1.setEnabled(False)
+            self.checkBox2.setEnabled(False)
+        else:
+            self.checkBox1.setEnabled(True)
+            self.checkBox2.setEnabled(True)
+            self.checkBox3.setEnabled(True)
+
+    def createuser(self):
+        if self.checkBox1.isChecked():
+            try : 
+                self.con = connect(
+                                    host= os.environ.get('dbhost'),
+                                    user= os.environ.get('dbmysqluser'),
+                                    password=os.environ.get('dbmysqlpassword'),
+                                  )
+                self.cur = self.con.cursor()
+                self.cur.execute(
+                    f"CREATE USER '{self.lineedit1.text()}'@'{self.lineedit3.text()}' IDENTIFIED BY '{self.lineedit2.text()}'"
+                    )
+                self.cur.execute("GRANT ALL PRIVILEGES ON *.* TO '%s'@'%s' WITH GRANT OPTION;"%(self.lineedit1.text(),self.lineedit3.text()))
+                self.cur.execute("FLUSH PRIVILEGES")
+                self.con.commit()
+                self.con.close()
+                message.UserCreatedSuccessfully()
+            
+            except:
+                message.ConnectionFailed()
+        
+        elif self.checkBox2.isChecked():
+            try :
+                self.con = connect(
+                                    host= os.environ.get('dbhost'),
+                                    user= os.environ.get('dbmysqluser'),
+                                    password=os.environ.get('dbmysqlpassword'),
+                                  )
+                self.cur = self.con.cursor()
+                self.cur.execute(
+                    f"CREATE USER '{self.lineedit1.text()}'@'{self.lineedit3.text()}' IDENTIFIED BY '{self.lineedit2.text()}'"
+                    )
+                self.cur.execute(
+                    "GRANT INSERT, UPDATE ON *.* TO '%s'@'%s' WITH GRANT OPTION;"%(self.lineedit1.text(),self.lineedit3.text())
+                    )
+                self.cur.execute("FLUSH PRIVILEGES")
+                self.con.commit()
+                self.con.close()
+                message.UserCreatedSuccessfully()
+            except:
+                message.ConnectionFailed()
+
+        elif self.checkBox3.isChecked():
+            try:
+                self.con = connect(
+                                    host= os.environ.get('dbhost'),
+                                    user= os.environ.get('dbmysqluser'),
+                                    password=os.environ.get('dbmysqlpassword'),
+                                  )
+                self.cur = self.con.cursor()
+                self.cur.execute(
+                    f"CREATE USER '{self.lineedit1.text()}'@'{self.lineedit3.text()}' IDENTIFIED BY '{self.lineedit2.text()}'"
+                    )
+                self.cur.execute(
+                    "GRANT UPDATE ON *.* TO '%s'@'%s' WITH GRANT OPTION;"%(self.lineedit1.text(),self.lineedit3.text())
+                )
+                self.cur.execute("FLUSH PRIVILEGES")
+                self.con.commit()
+                self.con.close()
+                message.UserCreatedSuccessfully()
+
+            except:
+                message.ConnectionFailed()
+
+        else :
+            message.SelectOneOfCheckBox()
+
+
 
 
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)    
     obj1 = PanelAdmin()
+    message = Message()
     sys.exit(app.exec_())
