@@ -3,11 +3,11 @@ from PyQt5.QtWidgets import (QWidget, QApplication, QLabel, QPushButton,
                             QComboBox, QMessageBox)
 
 from PyQt5.QtGui import QIcon, QFont
-import training
 import message
 import os
 import sys
-
+from mysql.connector import connect
+from admin import PanelAdmin
 
 class Window(QWidget):
     def __init__(self):
@@ -42,22 +42,29 @@ class Window(QWidget):
         self.show()
 
     def login(self):
-        #if self.line1.text() == "admin" and self.line2.text() == "admin":
-        #    self.close()
-        #    train.show()
-        if self.line1.text() == os.getenv("username") and self.line2.text() == os.getenv("pwd"):
-            self.close()
-            train.show()
-        else :
-            message.Error()
+        # CREATE ENVIRONMENT VARIABLES AND RESTART AND UPDATE WINDOWS
+            if self.line1.text() == os.getenv("dbmysqluser") and self.line2.text() == os.getenv("dbmysqlpassword"):
+                try:
+                    self.con = connect(
+                                        host=os.getenv("dbhost"),
+                                        username=self.line1.text(),
+                                        password=self.line2.text(),
+                                       )
+                    admin_panel.show()
+                    self.close()
 
-        
-        
+                except:
+                    message.ConnectionFailed()
+                    
+            else:
+                message.Error()
+
+       
 
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)    
     obj1 = Window()
-    train = training.Window()
+    admin_panel = PanelAdmin()
     message = message.Message()
     sys.exit(app.exec_())

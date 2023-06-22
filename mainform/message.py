@@ -11,3 +11,8 @@ class Message(QWidget):
         #msg.setStandardButtons(QMessageBox.Ok)
         #msg.exec_()
         QMessageBox.critical(self, "Error", "username or password is incorrect", QMessageBox.Ok)
+
+    def ConnectionFailed(self):
+
+        QMessageBox.warning(self, "connection failed", "cant connect to database\ncheck cable or network device", QMessageBox.Ok)
+
