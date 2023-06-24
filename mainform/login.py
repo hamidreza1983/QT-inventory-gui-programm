@@ -3,11 +3,12 @@ from PyQt5.QtWidgets import (QWidget, QApplication, QLabel, QPushButton,
                             QComboBox, QMessageBox)
 
 from PyQt5.QtGui import QIcon, QFont
-import message
+from message import Message
 import os
 import sys
 from mysql.connector import connect
-from admin import PanelAdmin
+import admin
+import dbconnection
 
 class Window(QWidget):
     def __init__(self):
@@ -39,25 +40,27 @@ class Window(QWidget):
         self.btn1.clicked.connect(self.login)
         self.btn2 = QPushButton("Cancel", self)
         self.btn2.move(60,70)
+        self.btn2.clicked.connect(exit)
         self.show()
 
     def login(self):
-        # CREATE ENVIRONMENT VARIABLES AND RESTART AND UPDATE WINDOWS
-            if self.line1.text() == os.getenv("dbmysqluser") and self.line2.text() == os.getenv("dbmysqlpassword"):
-                try:
-                    self.con = connect(
-                                        host=os.getenv("dbhost"),
-                                        username=self.line1.text(),
-                                        password=self.line2.text(),
-                                       )
-                    admin_panel.show()
-                    self.close()
 
-                except:
-                    message.ConnectionFailed()
-                    
-            else:
-                message.UserInputErrorError()
+        # CREATE ENVIRONMENT VARIABLES AND RESTART AND UPDATE WINDOWS
+
+        db_connection = dbconnection.Database(
+            username=self.line1.text(),
+            password=self.line2.text(),
+            host=os.getenv("dbhost"),
+            )
+
+        if db_connection.connect():
+            admin_panel.lable5.setText(self.line1.text())
+            admin_panel.lable6.setText(self.line2.text())
+            admin_panel.show()
+            self.close()
+            
+        else:
+            message.UserInputError()
 
        
 
@@ -65,6 +68,6 @@ class Window(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)    
     obj1 = Window()
-    admin_panel = PanelAdmin()
-    message = message.Message()
+    admin_panel = admin.PanelAdmin()
+    message = Message()
     sys.exit(app.exec_())

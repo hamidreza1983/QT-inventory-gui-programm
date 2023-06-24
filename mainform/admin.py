@@ -1,18 +1,19 @@
 from PyQt5.QtWidgets import (
                             QWidget, QApplication, QLabel, QPushButton, 
                             QLineEdit, QTextEdit, QCheckBox, QRadioButton,
-                            QComboBox, QGroupBox
+                            QComboBox, QGroupBox, QMainWindow
                             )
-
 from PyQt5.QtGui import QIcon, QFont
 import os
 import sys
 from mysql.connector import connect
-from message import Message
+import message
+import dbconnection
 
 
 
 class PanelAdmin(QWidget):
+
     def __init__(self):
         super().__init__()
         self.setUI()
@@ -34,6 +35,10 @@ class PanelAdmin(QWidget):
         self.lable2.move(10,60)
         self.lable3 = QLabel("host ip",self.group1)
         self.lable3.move(10,90)
+        self.lable5 = QLabel("user",self.group1)
+        self.lable5.setHidden(True)
+        self.lable6 = QLabel("pass",self.group1)
+        self.lable6.setHidden(True)
         #------------> Group1 QLineedit
         self.lineedit1 = QLineEdit(self.group1)
         self.lineedit1.move(60, 28)
@@ -67,14 +72,20 @@ class PanelAdmin(QWidget):
         #------------> Group2 QLable
         self.lable4 = QLabel("username",self.group2)
         self.lable4.move(10,28)
+        self.lable7 = QLabel("@",self.group2)
+        self.lable7.move(188,28)
         #------------> Group2 QLineedit
         self.lineedit4 = QLineEdit(self.group2)
         self.lineedit4.move(84, 25)
-        self.lineedit4.resize(200,25)
+        self.lineedit4.resize(100,25)
+        self.lineedit5 = QLineEdit(self.group2)
+        self.lineedit5.move(200, 25)
+        self.lineedit5.resize(100,25)
         #------------> Group2 QPushButton
         self.button2 = QPushButton("Delete user", self.group2)
-        self.button2.move(288,25)
-        self.button2.resize(88,25)
+        self.button2.move(305,25)
+        self.button2.resize(70,25)
+        self.button2.clicked.connect(self.deleteuser)
         #------------> self
         self.button3 = QPushButton("Daily profit and loos", self)
         self.button3.move(13,250)
@@ -92,9 +103,11 @@ class PanelAdmin(QWidget):
         self.button7.move(13,350)
         self.button7.resize(375,25)
         self.button8 = QPushButton("Exit", self)
+        self.button8.clicked.connect(exit)
         self.button8.move(13,380)
         self.button8.resize(375,25)
-        self.show()
+        #self.show()
+        
 
 
     def changeState(self):
@@ -115,71 +128,87 @@ class PanelAdmin(QWidget):
             self.checkBox3.setEnabled(True)
 
     def createuser(self):
+        from message import Message
+
+        message = Message()
+
         if self.checkBox1.isChecked():
-            try : 
-                self.con = connect(
-                                    host= os.environ.get('dbhost'),
-                                    user= os.environ.get('dbmysqluser'),
-                                    password=os.environ.get('dbmysqlpassword'),
-                                  )
-                self.cur = self.con.cursor()
-                self.cur.execute(
-                    f"CREATE USER '{self.lineedit1.text()}'@'{self.lineedit3.text()}' IDENTIFIED BY '{self.lineedit2.text()}'"
-                    )
-                self.cur.execute("GRANT ALL PRIVILEGES ON *.* TO '%s'@'%s' WITH GRANT OPTION;"%(self.lineedit1.text(),self.lineedit3.text()))
-                self.cur.execute("FLUSH PRIVILEGES")
-                self.con.commit()
-                self.con.close()
+
+            db_user = dbconnection.CreateDatabaseUser(
+                username=self.lable5.text(),
+                password=self.lable6.text(),
+                host=os.environ.get('dbhost'),
+                newuser=self.lineedit1.text(),
+                newpassword=self.lineedit2.text(),
+                newhost=self.lineedit3.text(),
+            )
+
+            if db_user.create_admin_user():
                 message.UserCreatedSuccessfully()
-            
-            except:
+
+            else :
                 message.ConnectionFailed()
         
         elif self.checkBox2.isChecked():
-            try :
-                self.con = connect(
-                                    host= os.environ.get('dbhost'),
-                                    user= os.environ.get('dbmysqluser'),
-                                    password=os.environ.get('dbmysqlpassword'),
-                                  )
-                self.cur = self.con.cursor()
-                self.cur.execute(
-                    f"CREATE USER '{self.lineedit1.text()}'@'{self.lineedit3.text()}' IDENTIFIED BY '{self.lineedit2.text()}'"
-                    )
-                self.cur.execute(
-                    "GRANT INSERT, UPDATE ON *.* TO '%s'@'%s' WITH GRANT OPTION;"%(self.lineedit1.text(),self.lineedit3.text())
-                    )
-                self.cur.execute("FLUSH PRIVILEGES")
-                self.con.commit()
-                self.con.close()
+
+            db_user = dbconnection.CreateDatabaseUser(
+                username=self.lable5.text(),
+                password=self.lable6.text(),
+                host=os.environ.get('dbhost'),
+                newuser=self.lineedit1.text(),
+                newpassword=self.lineedit2.text(),
+                newhost=self.lineedit3.text(),
+            )
+
+            if db_user.create_inventor_user():
                 message.UserCreatedSuccessfully()
-            except:
+            
+            else :
                 message.ConnectionFailed()
 
         elif self.checkBox3.isChecked():
-            try:
-                self.con = connect(
-                                    host= os.environ.get('dbhost'),
-                                    user= os.environ.get('dbmysqluser'),
-                                    password=os.environ.get('dbmysqlpassword'),
-                                  )
-                self.cur = self.con.cursor()
-                self.cur.execute(
-                    f"CREATE USER '{self.lineedit1.text()}'@'{self.lineedit3.text()}' IDENTIFIED BY '{self.lineedit2.text()}'"
-                    )
-                self.cur.execute(
-                    "GRANT UPDATE ON *.* TO '%s'@'%s' WITH GRANT OPTION;"%(self.lineedit1.text(),self.lineedit3.text())
-                )
-                self.cur.execute("FLUSH PRIVILEGES")
-                self.con.commit()
-                self.con.close()
+            db_user = dbconnection.CreateDatabaseUser(
+                username=self.lable5.text(),
+                password=self.lable6.text(),
+                host=os.environ.get('dbhost'),
+                newuser=self.lineedit1.text(),
+                newpassword=self.lineedit2.text(),
+                newhost=self.lineedit3.text(),
+            )
+            if db_user.create_seller_user():
                 message.UserCreatedSuccessfully()
-
-            except:
+            
+            else : 
                 message.ConnectionFailed()
-
         else :
             message.SelectOneOfCheckBox()
+    
+    def deleteuser(self):
+        from message import Message
+        message = Message()
+        try :
+            self.con = connect(
+                                host= os.environ.get('dbhost'),
+                                user= self.lable5.text(),
+                                password=self.lable6.text(),
+                                )
+                
+            self.cur = self.con.cursor()
+            self.cur.execute(
+                    "FLUSH HOSTS;"
+                    )
+            self.cur.execute(
+                    f"DROP USER '{self.lineedit4.text()}'@'{self.lineedit5.text()}';"
+                )
+            self.cur.execute(
+                    "FLUSH PRIVILEGES;"
+                )
+            self.con.commit()
+            self.con.close()
+            message.UserDeletedSuccessfully()
+
+        except:
+            message.UserDoesNotExist()
 
 
 
@@ -188,5 +217,4 @@ class PanelAdmin(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)    
     obj1 = PanelAdmin()
-    message = Message()
     sys.exit(app.exec_())
