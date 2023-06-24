@@ -7,7 +7,7 @@ class Message(QWidget):
         return QMessageBox.critical(self, "Error", "username or password is incorrect\nmay one or some fields be empty", QMessageBox.Ok)
 
     def ConnectionFailed(self):
-        return QMessageBox.warning(self, "connection failed", "cant connect to database\ncheck cable or network device\nmy be user is exists on database", QMessageBox.Ok)
+        return QMessageBox.warning(self, "connection failed", "cant connect to database\ncheck cable or network device\nmy be user is exists on database\nmy be access denied for this user or host", QMessageBox.Ok)
 
 
     def UserCreatedSuccessfully(self):
