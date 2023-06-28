@@ -8,13 +8,12 @@ from PyQt5.QtWidgets import (QWidget, QApplication, QLabel, QPushButton,
                             QComboBox, QMessageBox)
 
 from PyQt5.QtGui import QIcon, QFont
-
-
-
 from assets.info import Message
+
+
 from mysql.connector import connect
-import inventor
-from assets import dbconnection
+from admin import PanelAdmin
+from assets.dbconnection import *
 
 class Window(QWidget):
     def __init__(self):
@@ -53,16 +52,16 @@ class Window(QWidget):
 
         # CREATE ENVIRONMENT VARIABLES AND RESTART AND UPDATE WINDOWS
 
-        db_connection = dbconnection.Database(
+        db_connection = Database(
             username=self.line1.text(),
             password=self.line2.text(),
             host=os.getenv("dbhost"),
             )
 
         if db_connection.connect():
-            inventor.lable5.setText(self.line1.text())
-            inventor.lable6.setText(self.line2.text())
-            inventor.show()
+            admin_panel.lable5.setText(self.line1.text())
+            admin_panel.lable6.setText(self.line2.text())
+            admin_panel.show()
             self.close()
             
         else:
@@ -74,6 +73,6 @@ class Window(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)    
     obj1 = Window()
-    inventor = inventor.InventorPanel()
+    admin_panel = PanelAdmin()
     message = Message()
     sys.exit(app.exec_())

@@ -1,13 +1,19 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from PyQt5.QtWidgets import (QWidget, QApplication, QLabel, QPushButton, 
                             QLineEdit, QTextEdit, QCheckBox, QRadioButton,
                             QComboBox, QMessageBox)
 
 from PyQt5.QtGui import QIcon, QFont
-from core import message
-import os
-import sys
+from assets.info import Message
+
+
 from mysql.connector import connect
-import admin
+from seller.seller import SellerPanel
+from assets.dbconnection import *
 
 class Window(QWidget):
     def __init__(self):
@@ -46,16 +52,16 @@ class Window(QWidget):
 
         # CREATE ENVIRONMENT VARIABLES AND RESTART AND UPDATE WINDOWS
 
-        db_connection = core.dbconnection.Database(
+        db_connection = Database(
             username=self.line1.text(),
             password=self.line2.text(),
             host=os.getenv("dbhost"),
             )
 
         if db_connection.connect():
-            admin_panel.lable5.setText(self.line1.text())
-            admin_panel.lable6.setText(self.line2.text())
-            admin_panel.show()
+            seller_panel.lable5.setText(self.line1.text())
+            seller_panel.lable6.setText(self.line2.text())
+            seller_panel.show()
             self.close()
             
         else:
@@ -67,6 +73,6 @@ class Window(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)    
     obj1 = Window()
-    admin_panel = admin.PanelAdmin()
-    message = message.Message()
+    seller_panel = SellerPanel()
+    message = Message()
     sys.exit(app.exec_())

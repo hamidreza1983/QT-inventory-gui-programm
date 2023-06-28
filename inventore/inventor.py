@@ -1,12 +1,17 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from PyQt5.QtWidgets import (
                             QWidget, QApplication, QLabel, QPushButton, 
                             QLineEdit, QTextEdit, QCheckBox, QRadioButton,
                             QComboBox, QGroupBox, QMainWindow, QSpinBox
                             )
 from PyQt5.QtGui import QIcon, QFont
-import os
-import sys
+
 from mysql.connector import connect
+from assets.info import Message
 
 class InventorPanel(QWidget):
     def __init__(self):
@@ -81,12 +86,9 @@ class InventorPanel(QWidget):
         self.button2.resize(100,23)
         self.button2.clicked.connect(self.delete_product)
 
-
-
-        self.show()
     
     def update_db(self):
-        from core.message import Message
+        
         
         message = Message()
 
@@ -150,14 +152,14 @@ class InventorPanel(QWidget):
             message.DatabaseUpdatedSuccessfully()
 
     def delete_product(self):
-        from core.message import Message
+        from assets.info import Message
 
         message = Message()
 
         self.db_user = connect(
-            host = 'localhost',
-            username = 'root',
-            password = 'root',
+            host = os.getenv('dbhost'),
+            username = self.lable5.text(),
+            password = self.lable6.text(),
             database = 'store',
             )
 

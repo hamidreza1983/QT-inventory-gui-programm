@@ -1,14 +1,17 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from PyQt5.QtWidgets import (
                             QWidget, QApplication, QLabel, QPushButton, 
                             QLineEdit, QTextEdit, QCheckBox, QRadioButton,
                             QComboBox, QGroupBox, QMainWindow
                             )
 from PyQt5.QtGui import QIcon, QFont
-import os
-import sys
+
 from mysql.connector import connect
-import message
-import dbconnection
+from assets import dbconnection, info
 
 
 
@@ -128,9 +131,9 @@ class PanelAdmin(QWidget):
             self.checkBox3.setEnabled(True)
 
     def createuser(self):
-        from message import Message
 
-        message = Message()
+
+        message = info.Message()
 
         if self.checkBox1.isChecked():
 
@@ -184,8 +187,8 @@ class PanelAdmin(QWidget):
             message.SelectOneOfCheckBox()
     
     def deleteuser(self):
-        from message import Message
-        message = Message()
+
+        message = info.Message()
         db_user = dbconnection.DatabaseUserManager(
                 username=self.lable5.text(),
                 password=self.lable6.text(),
