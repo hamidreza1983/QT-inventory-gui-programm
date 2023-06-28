@@ -3,12 +3,11 @@ from PyQt5.QtWidgets import (QWidget, QApplication, QLabel, QPushButton,
                             QComboBox, QMessageBox)
 
 from PyQt5.QtGui import QIcon, QFont
-from message import Message
+from core import message
 import os
 import sys
 from mysql.connector import connect
 import admin
-import dbconnection
 
 class Window(QWidget):
     def __init__(self):
@@ -47,7 +46,7 @@ class Window(QWidget):
 
         # CREATE ENVIRONMENT VARIABLES AND RESTART AND UPDATE WINDOWS
 
-        db_connection = dbconnection.Database(
+        db_connection = core.dbconnection.Database(
             username=self.line1.text(),
             password=self.line2.text(),
             host=os.getenv("dbhost"),
@@ -69,5 +68,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)    
     obj1 = Window()
     admin_panel = admin.PanelAdmin()
-    message = Message()
+    message = message.Message()
     sys.exit(app.exec_())

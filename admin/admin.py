@@ -134,7 +134,7 @@ class PanelAdmin(QWidget):
 
         if self.checkBox1.isChecked():
 
-            db_user = dbconnection.CreateDatabaseUser(
+            db_user = dbconnection.DatabaseUserManager(
                 username=self.lable5.text(),
                 password=self.lable6.text(),
                 host=os.environ.get('dbhost'),
@@ -151,7 +151,7 @@ class PanelAdmin(QWidget):
         
         elif self.checkBox2.isChecked():
 
-            db_user = dbconnection.CreateDatabaseUser(
+            db_user = dbconnection.DatabaseUserManager(
                 username=self.lable5.text(),
                 password=self.lable6.text(),
                 host=os.environ.get('dbhost'),
@@ -167,7 +167,7 @@ class PanelAdmin(QWidget):
                 message.ConnectionFailed()
 
         elif self.checkBox3.isChecked():
-            db_user = dbconnection.CreateDatabaseUser(
+            db_user = dbconnection.DatabaseUserManager(
                 username=self.lable5.text(),
                 password=self.lable6.text(),
                 host=os.environ.get('dbhost'),
@@ -186,28 +186,17 @@ class PanelAdmin(QWidget):
     def deleteuser(self):
         from message import Message
         message = Message()
-        try :
-            self.con = connect(
-                                host= os.environ.get('dbhost'),
-                                user= self.lable5.text(),
-                                password=self.lable6.text(),
-                                )
-                
-            self.cur = self.con.cursor()
-            self.cur.execute(
-                    "FLUSH HOSTS;"
-                    )
-            self.cur.execute(
-                    f"DROP USER '{self.lineedit4.text()}'@'{self.lineedit5.text()}';"
-                )
-            self.cur.execute(
-                    "FLUSH PRIVILEGES;"
-                )
-            self.con.commit()
-            self.con.close()
+        db_user = dbconnection.DatabaseUserManager(
+                username=self.lable5.text(),
+                password=self.lable6.text(),
+                host=os.environ.get('dbhost'),
+                newuser=self.lineedit4.text(),
+                newhost=self.lineedit5.text(),
+            )
+        if db_user.delete_user():
             message.UserDeletedSuccessfully()
-
-        except:
+        
+        else:
             message.UserDoesNotExist()
 
 

@@ -19,7 +19,7 @@ class Database:
         except:
             return False    
 
-class CreateDatabaseUser:
+class DatabaseUserManager:
     def __init__(self,username=None,password=None,host=None,newuser=None,newpassword=None,newhost=None):
         self.username = username
         self.password = password
@@ -62,11 +62,13 @@ class CreateDatabaseUser:
                 "CREATE USER '%s'@'%s' IDENTIFIED BY '%s';" % (self.newuser,self.newhost,self.newpassword)
                 )
             self.cur.execute(
-                "GRANT INSERT, UPDATE ON *.* TO '%s'@'%s' WITH GRANT OPTION;"%(self.newuser,self.newhost)
+                "GRANT INSERT,UPDATE,SELECT,DELETE ON *.* TO '%s'@'%s' WITH GRANT OPTION;"%(self.newuser,self.newhost)
                 )
             self.cur.execute(
                 "FLUSH PRIVILEGES;"
                 )
+            self.connection.commit()
+            self.connection.close()
             return True
         except:
             return False
@@ -88,7 +90,31 @@ class CreateDatabaseUser:
             self.cur.execute(
                 "FLUSH PRIVILEGES;"
                 )
+            self.connection.commit()
+            self.connection.close()
             return True
         except:
             return False
+    
+    def delete_user(self):
+        try:
+            self.connection = connector.connect(
+                username=self.username, 
+                password=self.password, 
+                host=self.host, 
+                )
+            self.cur = self.connection.cursor()
+            self.cur.execute(
+                "DROP USER '%s'@'%s';"%(self.newuser,self.newhost)
+                )
+            self.cur.execute(
+                "FLUSH PRIVILEGES;"
+                )
+            self.connection.commit()
+            self.connection.close()
+            return True
+        except:
+            return False
+
+
 
