@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from PyQt5.QtWidgets import (
                             QWidget, QApplication, QLabel, QPushButton, 
                             QLineEdit, QTextEdit, QCheckBox, QRadioButton,
-                            QComboBox, QGroupBox, QMainWindow, QSpinBox
+                            QComboBox, QGroupBox, QMainWindow, QSpinBox,Q
                             )
 from PyQt5.QtGui import QIcon, QFont
 
